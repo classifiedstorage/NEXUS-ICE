@@ -36,6 +36,33 @@ To use NEXUS ICE, follow these simple steps:
 
 To get started with NEXUS ICE, simply clone the repository and run the provided code samples. Make sure to read the documentation and follow best practices for secure communication.
 
+### Prerequisites
+
+NEXUS ICE uses the BouncyCastle NuGet package for cryptographic operations. You will need to install this package to build the project. You can install it via NuGet Package Manager or using the following command:
+
+```bash
+dotnet add package BouncyCastle
+```
+
+### Cloning the Repository
+
+Clone the NEXUS ICE repository to your local machine using Git:
+
+```bash
+git clone https://github.com/yourusername/nexus-ice.git
+```
+
+### Building the Project
+
+Navigate to the project directory and build the solution:
+
+```bash
+cd nexus-ice
+dotnet build
+```
+
+This will compile the project and resolve any dependencies, including the BouncyCastle package.
+
 ## Contributions
 
 Contributions to NEXUS ICE are welcome! If you have suggestions for improvements or new features, feel free to open an issue or submit a pull request.
