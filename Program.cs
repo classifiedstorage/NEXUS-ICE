@@ -23,7 +23,7 @@ namespace ICE
                 {
                     while (true)
                     {
-                        Console.Write("\n127.0.0.1:80> ");
+                        Console.Write("\n" + Environment.MachineName + "> ");
                         string command = Console.ReadLine().Trim();
                         if (command.Equals("/help", StringComparison.OrdinalIgnoreCase))
                         {
