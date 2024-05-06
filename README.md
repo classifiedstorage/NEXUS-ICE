@@ -49,7 +49,7 @@ dotnet add package BouncyCastle
 Clone the NEXUS ICE repository to your local machine using Git:
 
 ```bash
-git clone https://github.com/yourusername/nexus-ice.git
+git clone https://github.com/classifiedstorage/nexus-ice.git
 ```
 
 ### Building the Project
