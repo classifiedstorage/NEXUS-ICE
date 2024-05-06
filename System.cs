@@ -71,13 +71,18 @@ namespace ICE
                 string[] parts = Script.DeconstructToken(token);
                 if (parts.Length != 2)
                 {
-                    Console.WriteLine("Invalid receiver info format.");
+                    Console.WriteLine("Invalid token format.");
                     return;
                 }
                 string receiverIpAddress = parts[0];
+                if (!IPAddress.TryParse(receiverIpAddress, out IPAddress ipAddress))
+                {
+                    Console.WriteLine("Invalid receiver IP address.");
+                    return;
+                }
                 if (!int.TryParse(parts[1], out int receiverPort))
                 {
-                    Console.WriteLine("Invalid receiver info format.");
+                    Console.WriteLine("Invalid receiver port number.");
                     return;
                 }
                 using (TcpClient client = new TcpClient())
@@ -102,8 +107,6 @@ namespace ICE
             catch (Exception ex)
             {
                 Console.WriteLine("Error: " + ex.Message);
-                Console.WriteLine("Press any key to close.");
-                Console.ReadKey();
             }
         }
 
@@ -215,50 +218,53 @@ namespace ICE
                     return;
                 }
                 string senderIpAddress = parts[0];
-                if (!int.TryParse(parts[1], out int senderPort))
+                if (!IPAddress.TryParse(senderIpAddress, out IPAddress ipAddress))
                 {
-                    Console.WriteLine("Invalid token format.");
+                    Console.WriteLine("Invalid sender IP address.");
                     return;
                 }
-                TcpListener listener = new TcpListener(IPAddress.Parse(senderIpAddress), senderPort);
+                if (!int.TryParse(parts[1], out int senderPort))
+                {
+                    Console.WriteLine("Invalid sender port number.");
+                    return;
+                }
+                TcpListener listener = new TcpListener(ipAddress, senderPort);
                 listener.Start();
                 Console.WriteLine("Waiting for sender to connect...");
                 using (TcpClient client = await listener.AcceptTcpClientAsync())
-                using (NetworkStream stream = client.GetStream())
                 {
-                    Console.WriteLine("Sender connected.");
-                    byte[] sharedSecret = PerformKeyExchange(client);
-                    byte[] decryptionKey = DeriveKey(sharedSecret);
-                    byte[] receivedData = new byte[client.ReceiveBufferSize];
-                    int bytesRead = await stream.ReadAsync(receivedData, 0, receivedData.Length);
-                    byte[] signature = new byte[256];
-                    byte[] encryptedFileBytes = new byte[bytesRead - 256];
-                    Buffer.BlockCopy(receivedData, 0, signature, 0, signature.Length);
-                    Buffer.BlockCopy(receivedData, signature.Length, encryptedFileBytes, 0, encryptedFileBytes.Length);
-                    if (VerifySignature(encryptedFileBytes, signature))
+                    using (NetworkStream stream = client.GetStream())
                     {
-                        byte[] decryptedFileBytes = AesGcmDecrypt(encryptedFileBytes, decryptionKey);
-                        Console.WriteLine("Warning! You must enter path like this: C:\\Users\\hyper\\Downloads\\data.zip");
-                        Console.Write("Enter path: ");
-                        string savePath = Console.ReadLine();
-                        File.WriteAllBytes(savePath, decryptedFileBytes);
-                        Console.WriteLine("File received and saved successfully.");
-                        Console.WriteLine("Press any key to close.");
-                        Console.ReadKey();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Signature verification failed. File integrity compromised.");
-                        Console.WriteLine("Press any key to close.");
-                        Console.ReadKey();
+                        Console.WriteLine("Sender connected.");
+                        byte[] sharedSecret = PerformKeyExchange(client);
+                        byte[] decryptionKey = DeriveKey(sharedSecret);
+                        byte[] receivedData = new byte[client.ReceiveBufferSize];
+                        int bytesRead = await stream.ReadAsync(receivedData, 0, receivedData.Length);
+                        byte[] signature = new byte[256];
+                        byte[] encryptedFileBytes = new byte[bytesRead - 256];
+                        Buffer.BlockCopy(receivedData, 0, signature, 0, signature.Length);
+                        Buffer.BlockCopy(receivedData, signature.Length, encryptedFileBytes, 0, encryptedFileBytes.Length);
+                        if (VerifySignature(encryptedFileBytes, signature))
+                        {
+                            byte[] decryptedFileBytes = AesGcmDecrypt(encryptedFileBytes, decryptionKey);
+                            Console.WriteLine("Warning! You must enter path like this: C:\\Users\\hyper\\Downloads\\data.zip");
+                            Console.Write("Enter path: ");
+                            string savePath = Console.ReadLine();
+                            File.WriteAllBytes(savePath, decryptedFileBytes);
+                            Console.WriteLine("File received and saved successfully.");
+                            Console.WriteLine("Press any key to close.");
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Signature verification failed. File integrity compromised.");
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error: " + ex.Message);
-                Console.WriteLine("Press any key to close.");
-                Console.ReadKey();
             }
         }
 
