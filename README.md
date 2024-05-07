@@ -2,6 +2,8 @@
 
 NEXUS ICE is a secure data transfer protocol designed to facilitate fast and intercept-resistant communication between two endpoints. It ensures military-grade security while providing a user-friendly interface for easy interaction.
 
+<div align="center"> <img src="https://repository-images.githubusercontent.com/796777094/8655f345-0922-406b-b5e8-905c5af31cfe"> </div>
+
 ## Features
 
 - **End-to-End Encryption:** All data transferred through NEXUS ICE is encrypted end-to-end using state-of-the-art encryption algorithms.
